@@ -1,11 +1,11 @@
-import { Request } from "express";
+import { Request, Response, NextFunction } from "express";
 import * as multer from "multer";
 import { v4 } from "uuid";
 import * as path from "path";
 
 const storage = multer.diskStorage({
-  destination: "./uploads/profilePicture",
-  filename: (_, file, cb) => {
+  destination: "./uploads/categories",
+  filename: (req, file, cb) => {
     cb(null, v4() + path.extname(file.originalname));
   },
 });
@@ -29,7 +29,7 @@ const fileFilter = (
 
   callback(null, true);
 };
-const uploadProfilePicture = multer({
+const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
@@ -37,4 +37,4 @@ const uploadProfilePicture = multer({
   },
 });
 
-export default uploadProfilePicture;
+export default upload;

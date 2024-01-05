@@ -1,20 +1,32 @@
 import * as express from "express";
+import * as morgan from "morgan";
 import * as path from "path";
-import router from "./routes/index";
-import logger from "./middlewares/logger";
-import * as cors from "cors";
+import indexRoutes from "./routes/index";
+import connectDB from "./config/db.conn";
+import errorHandler from "./middleware/error";
 
-const app: express.Application = express();
-const port = process.env.PORT || 4500;
-const address = `127.0.0.1:${port}`;
+const app = express();
 
+app.set("port", process.env.PORT || 4000);
+
+app.use(morgan("dev"));
 app.use(express.json());
-app.use(cors());
 
-app.use("/api", logger, router);
-// Public
+app.use("/api", indexRoutes);
+
+app.use(errorHandler);
+
 app.use("/uploads", express.static(path.resolve("uploads")));
 
-app.listen(port, function () {
-  console.log(`starting app on: ${address}`);
-});
+async function startServer() {
+  try {
+    await connectDB();
+    app.listen(app.get("port"), () => {
+      console.log(`Server on port ${app.get("port")}`);
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+startServer();
